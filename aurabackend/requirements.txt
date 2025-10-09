@@ -8,7 +8,6 @@ httpx
 # Database drivers
 psycopg2-binary
 PyMySQL
-sqlite3
 pyodbc
 cx_Oracle
 pymongo

@@ -6,6 +6,10 @@ import sys
 import os
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Add the parent directory to Python path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,9 +33,10 @@ class AgentResponse(BaseModel):
 api_gateway = FastAPI()
 
 # Add CORS middleware to allow frontend connections
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:3000").split(",")
 api_gateway.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -102,5 +107,12 @@ async def test_database_connection(db_type: str):
 
 if __name__ == "__main__":
     import uvicorn
-    print("🌐 Starting AURA API Gateway on port 8000...")
-    uvicorn.run("main:api_gateway", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("API_GATEWAY_PORT", 8000))
+    host = os.getenv("API_HOST", "0.0.0.0")
+    debug = os.getenv("DEBUG", "false").lower() == "true"
+    
+    print(f"🌐 Starting AURA API Gateway on {host}:{port}...")
+    if debug:
+        print("🐛 Debug mode enabled")
+    
+    uvicorn.run("main:api_gateway", host=host, port=port, reload=debug)

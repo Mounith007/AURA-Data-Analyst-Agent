@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 import uuid
 
-from connection_manager import (
+from .connection_manager import (
     DatabaseConnection, 
     DatabaseType, 
     db_manager
