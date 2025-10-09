@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # Database Service - Our new enterprise database connectivity service
+  database_service:
+    build: ./aurabackend
+    command: uvicorn database.main:app --host 0.0.0.0 --port 8002 --reload
+    ports:
+      - "8002:8002"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=sqlite:///./aura.db
+    volumes:
+      - ./aurabackend:/app
+      - database_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # API Gateway - Main entry point
+  api_gateway:
+    build: ./aurabackend
+    command: uvicorn api_gateway.main:api_gateway --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    depends_on:
+      database_service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Orchestration Service - Multi-agent system
+  orchestration_service:
+    build: ./aurabackend
+    command: uvicorn orchestration_service.main:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    depends_on:
+      - database_service
+    restart: unless-stopped
+
+  # Code Generation Service
+  code_generation_service:
+    build: ./aurabackend
+    command: uvicorn code_generation_service.main:code_gen_app --host 0.0.0.0 --port 8003
+    ports:
+      - "8003:8003"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    restart: unless-stopped
+
+  # Execution Sandbox
+  execution_sandbox:
+    build: ./aurabackend
+    command: uvicorn execution_sandbox.main:execution_app --host 0.0.0.0 --port 8004
+    ports:
+      - "8004:8004"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    restart: unless-stopped
+
+  # Knowledge Base Service
+  knowledge_base:
+    build: ./aurabackend
+    command: uvicorn knowledge_base.main:kb_app --host 0.0.0.0 --port 8005
+    ports:
+      - "8005:8005"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    restart: unless-stopped
+
+  # Metadata Store Service
+  metadata_store:
+    build: ./aurabackend
+    command: uvicorn metadata_store.main:metadata_app --host 0.0.0.0 --port 8006
+    ports:
+      - "8006:8006"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    restart: unless-stopped
+
+volumes:
+  database_data:
+    driver: local
+
+networks:
+  default:
+    name: aura-network
+    driver: bridge

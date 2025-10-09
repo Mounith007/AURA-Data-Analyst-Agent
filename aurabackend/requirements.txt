@@ -1,0 +1,25 @@
+fastapi
+uvicorn[standard]
+pydantic
+google-generativeai
+python-dotenv
+httpx
+
+# Database drivers
+psycopg2-binary
+PyMySQL
+sqlite3
+pyodbc
+cx_Oracle
+pymongo
+snowflake-connector-python
+google-cloud-bigquery
+redshift-connector
+databricks-sql-connector
+clickhouse-driver
+cassandra-driver
+
+# Additional dependencies
+sqlalchemy
+pandas
+numpy
