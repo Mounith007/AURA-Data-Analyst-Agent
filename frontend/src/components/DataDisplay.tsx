@@ -1,5 +1,6 @@
 import React from 'react';
 import VisualizationPanel from './VisualizationPanel';
+import { useTheme } from '../contexts/ThemeContext';
 import type { DataResult } from '../types';
 
 interface DataDisplayProps {
@@ -7,9 +8,11 @@ interface DataDisplayProps {
 }
 
 const DataDisplay: React.FC<DataDisplayProps> = ({ dataResult }) => {
+  const { theme } = useTheme();
+  
   if (!dataResult) {
     return (
-      <div className="data-display">
+      <div className="data-display" data-theme={theme}>
         <div className="no-data-message">
           <h3>💡 Ready for Analysis</h3>
           <p>Submit a query to see your data visualized with interactive charts and tables.</p>
@@ -19,7 +22,7 @@ const DataDisplay: React.FC<DataDisplayProps> = ({ dataResult }) => {
   }
 
   return (
-    <div className="data-display">
+    <div className="data-display" data-theme={theme}>
       <VisualizationPanel data={dataResult} />
     </div>
   );

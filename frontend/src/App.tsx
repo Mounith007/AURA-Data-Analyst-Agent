@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import './App.css';
+import { ThemeProvider } from './contexts/ThemeContext';
 import NavigationBar from './components/NavigationBar';
 import ChatArea from './components/ChatArea';
 import ResultsArea from './components/ResultsArea';
-import StrategicDemo from './components/StrategicDemo';
-import DatabaseConnector from './components/DatabaseConnector';
-import DataVisualization from './components/DataVisualization';
+import TrendAnalysis from './components/TrendAnalysis';
+import ResizableLayout from './components/Layout/ResizableLayout';
+import LeftSidebar from './components/LeftSidebar';
+import GlassBox from './components/GlassBox';
+import BackgroundParticles from './components/BackgroundParticles';
 import type { DataResult } from './types';
-import type { VerticalConfig } from './components/VerticalSelector';
 
-function App() {
+import type { Message } from './components/MessageList';
+
+function AppContent() {
   const [currentMode, setCurrentMode] = useState<'chat' | 'database' | 'visualization' | 'strategic'>('chat');
   const [sqlQuery, setSqlQuery] = useState('-- Generated SQL will appear here');
   const [dataResult, setDataResult] = useState<DataResult | null>(null);
@@ -17,9 +21,86 @@ function App() {
   const [pendingApproval, setPendingApproval] = useState(false);
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
-  const [selectedVertical, setSelectedVertical] = useState<VerticalConfig | null>(null);
+
+  
+  // New dynamic features
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [uploadedData, setUploadedData] = useState<any[] | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string>('');
+  const [showTrendAnalysis, setShowTrendAnalysis] = useState(false);
+
+  // Real connections data - starts empty
+  const [connections] = useState([]);
+
+  // Dynamic chat system
+  const addMessage = (type: 'user' | 'assistant' | 'system', content: string, data?: any) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      type,
+      content,
+      timestamp: new Date(),
+      data
+    };
+    setMessages(prev => [...prev, newMessage]);
+    return newMessage.id;
+  };
+
+  const handleQuickAction = (action: string) => {
+    let prompt = '';
+    switch (action) {
+      case 'analyze_trends':
+        prompt = 'Show me sales trends for the last quarter';
+        break;
+      case 'create_chart':
+        prompt = 'Create a visualization of my data';
+        break;
+      case 'connect_database':
+        setCurrentMode('database');
+        return;
+      case 'analyze_data':
+        if (uploadedData) {
+          setShowTrendAnalysis(true);
+        } else {
+          prompt = 'Help me analyze my data patterns';
+        }
+        break;
+      default:
+        prompt = action;
+    }
+    if (prompt) {
+      handleQuerySubmit(prompt);
+    }
+  };
+
+  const handleFileUpload = (file: File, data: any[]) => {
+    setUploadedData(data);
+    setUploadedFileName(file.name);
+    setShowTrendAnalysis(true);
+    
+    // Add system message about file upload
+    addMessage('system', `Successfully uploaded ${file.name} with ${data.length} records`, {
+      fileName: file.name,
+      recordCount: data.length,
+      columns: data.length > 0 ? Object.keys(data[0]) : []
+    });
+  };
+
+  const handleConnectionSelect = (connection: any) => {
+    addMessage('system', `🔌 Connected to: ${connection.name}`);
+    console.log('Selected connection:', connection);
+  };
+
+  const handleNewConnection = () => {
+    addMessage('system', '➕ Opening new connection dialog...');
+    console.log('Create new connection');
+  };
 
   const handleQuerySubmit = async (prompt: string) => {
+    // Add user message
+    addMessage('user', prompt);
+    
+    setIsTyping(true);
     setIsLoading(true);
     setPendingApproval(false);
     setDataResult(null);
@@ -43,18 +124,27 @@ function App() {
       if (result.status === 'Success') {
         setSqlQuery(result.final_query || '-- No SQL generated');
         setCurrentJobId(result.job_id || 'job_' + Date.now());
-        // Show Glass Box IDE for manual review and approval
+        
+        // Add assistant response
+        addMessage('assistant', 'I\'ve analyzed your request and generated a query. Please review it below for approval.', {
+          query: result.final_query,
+          jobId: result.job_id
+        });
+        
         setPendingApproval(true);
       } else {
         setSqlQuery('-- Error: ' + (result.error_message || 'Unknown error'));
+        addMessage('assistant', 'I encountered an error while processing your request: ' + (result.error_message || 'Unknown error'));
         setPendingApproval(false);
       }
     } catch (error) {
       console.error('Error calling API:', error);
       setSqlQuery('-- Error: Failed to connect to backend');
+      addMessage('assistant', 'Sorry, I\'m having trouble connecting to the analysis service. Please try again.');
       setPendingApproval(false);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -92,71 +182,76 @@ function App() {
 
 
 
-  const handleVerticalSelect = (vertical: VerticalConfig) => {
-    setSelectedVertical(vertical);
-  };
-
   const handleModeChange = (mode: 'chat' | 'database' | 'visualization' | 'strategic') => {
     setCurrentMode(mode);
   };
 
-  const renderCurrentMode = () => {
-    switch (currentMode) {
-      case 'chat':
-        return (
-          <div className="main-content">
-            <ChatArea onQuerySubmit={handleQuerySubmit} isLoading={isLoading} />
-            <ResultsArea 
-              sqlQuery={sqlQuery} 
-              dataResult={dataResult} 
-              pendingApproval={pendingApproval}
-              onApproval={handleSqlApproval}
-              isLoading={isLoading}
-            />
-          </div>
-        );
-      case 'database':
-        return <DatabaseConnector />;
-      case 'visualization':
-        return <DataVisualization />;
-      case 'strategic':
-        return <StrategicDemo onVerticalSelect={handleVerticalSelect} />;
-      default:
-        return (
-          <div className="main-content">
-            <ChatArea onQuerySubmit={handleQuerySubmit} isLoading={isLoading} />
-            <ResultsArea 
-              sqlQuery={sqlQuery} 
-              dataResult={dataResult} 
-              pendingApproval={pendingApproval}
-              onApproval={handleSqlApproval}
-              isLoading={isLoading}
-            />
-          </div>
-        );
-    }
-  };
-
   return (
     <div className="app">
+      <BackgroundParticles />
       <NavigationBar currentMode={currentMode} onModeChange={handleModeChange} />
       
-      {selectedVertical && (
-        <div style={{ 
-          padding: '12px 20px', 
-          background: 'linear-gradient(45deg, #667eea, #764ba2)', 
-          color: 'white',
-          textAlign: 'center',
-          fontSize: '14px',
-          fontWeight: '600'
-        }}>
-          Active Vertical: {selectedVertical.icon} {selectedVertical.name}
-        </div>
-      )}
-
-      <div className="app-content">
-        {renderCurrentMode()}
-      </div>
+      <ResizableLayout
+        leftPanel={{
+          id: 'sidebar',
+          title: 'Data Sources',
+          content: (
+            <LeftSidebar
+              connections={connections}
+              onConnectionSelect={handleConnectionSelect}
+              onNewConnection={handleNewConnection}
+              onFileUpload={handleFileUpload}
+              isLoading={isLoading}
+            />
+          ),
+          minWidth: 250,
+          defaultWidth: 300
+        }}
+        middleTopPanel={{
+          id: 'results',
+          title: 'Query Results',
+          content: (
+            <ResultsArea 
+              sqlQuery={sqlQuery} 
+              dataResult={dataResult} 
+              pendingApproval={pendingApproval}
+              onApproval={handleSqlApproval}
+              isLoading={isLoading}
+            />
+          ),
+          minHeight: 200,
+          defaultHeight: 400
+        }}
+        middleBottomPanel={{
+          id: 'glassbox',
+          title: 'Analytics Dashboard',
+          content: (
+            <GlassBox title="Dynamic Glass Panel">
+              {showTrendAnalysis && uploadedData && (
+                <TrendAnalysis 
+                  data={uploadedData}
+                  fileName={uploadedFileName}
+                />
+              )}
+            </GlassBox>
+          )
+        }}
+        rightPanel={{
+          id: 'chat',
+          title: 'AI Assistant',
+          content: (
+            <ChatArea 
+              onQuerySubmit={handleQuerySubmit} 
+              isLoading={isLoading}
+              messages={messages}
+              isTyping={isTyping}
+              onQuickAction={handleQuickAction}
+            />
+          ),
+          minWidth: 300,
+          defaultWidth: 400
+        }}
+      />
     </div>
   );
 }
@@ -267,4 +362,10 @@ function generateSampleData(prompt: string): DataResult {
   }
 }
 
-export default App;
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}

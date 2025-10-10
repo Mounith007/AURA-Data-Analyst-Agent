@@ -13,6 +13,7 @@ import {
   RadialLinearScale,
 } from 'chart.js';
 import { Bar, Line, Pie, Doughnut, Radar, PolarArea } from 'react-chartjs-2';
+import { useTheme } from '../contexts/ThemeContext';
 import './DataVisualization.css';
 
 ChartJS.register(
@@ -57,6 +58,7 @@ interface ChartConfig {
 }
 
 const DataVisualization: React.FC = () => {
+  const { theme } = useTheme();
   const [connections, setConnections] = useState<DatabaseConnection[]>([]);
   const [selectedConnection, setSelectedConnection] = useState<string>('');
   const [sqlQuery, setSqlQuery] = useState<string>('');
@@ -245,7 +247,7 @@ const DataVisualization: React.FC = () => {
   };
 
   return (
-    <div className="data-visualization">
+    <div className="data-visualization" data-theme={theme}>
       <div className="viz-header">
         <h2>📊 Data Visualization Studio</h2>
         <p>Transform your database queries into beautiful, interactive charts</p>

@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import sys
@@ -13,6 +13,13 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Add the parent directory to Python path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Import file service
+try:
+    from shared.file_service import file_service
+except ImportError as e:
+    print(f"Warning: File service not available - {e}")
+    file_service = None
 
 # Define models directly here to avoid import issues
 class ChatRequest(BaseModel):
@@ -49,6 +56,30 @@ def root():
 @api_gateway.get("/health")
 def health_check():
     return {"status": "healthy", "service": "api_gateway"}
+
+@api_gateway.get("/files/supported-formats")
+def get_supported_formats():
+    """Get list of supported file formats"""
+    try:
+        return {
+            "status": "success",
+            "supported_formats": {
+                "csv": {"extensions": [".csv"], "description": "Comma-separated values", "icon": "📊"},
+                "excel": {"extensions": [".xlsx", ".xls"], "description": "Microsoft Excel", "icon": "📈"},
+                "json": {"extensions": [".json"], "description": "JavaScript Object Notation", "icon": "🔗"},
+                "text": {"extensions": [".txt"], "description": "Plain text files", "icon": "📄"},
+                "parquet": {"extensions": [".parquet"], "description": "Apache Parquet columnar storage", "icon": "🗃️"}
+            },
+            "max_file_size": "25MB",
+            "notes": {
+                "parquet": "Optimized for analytics workloads, supports compression and efficient querying",
+                "csv": "Most common format, human-readable",
+                "excel": "Supports multiple sheets and formatting",
+                "json": "Flexible structure, good for nested data"
+            }
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
 
 @api_gateway.post("/chat")
 async def chat_endpoint(request: ChatRequest):
@@ -104,6 +135,85 @@ async def test_database_connection(db_type: str):
             return response.json()
     except Exception as e:
         return {"error": f"Database service unavailable: {str(e)}", "status": "error"}
+
+# File Upload Endpoints
+@api_gateway.post("/files/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Upload and process a data file (CSV, JSON, Excel, TXT, Parquet)"""
+    if file_service is None:
+        raise HTTPException(status_code=503, detail="File service not available")
+    
+    try:
+        # Save file
+        file_metadata = await file_service.save_file(file)
+        
+        # Process file
+        processed_metadata = await file_service.process_file(file_metadata)
+        
+        return {
+            "status": "success",
+            "message": "File uploaded and processed successfully",
+            "file_info": {
+                "file_id": processed_metadata["file_id"],
+                "original_filename": processed_metadata["original_filename"],
+                "file_size": processed_metadata["file_size"],
+                "rows_count": processed_metadata["rows_count"],
+                "columns_count": processed_metadata["columns_count"],
+                "upload_time": processed_metadata["upload_time"],
+                "processed_time": processed_metadata["processed_time"]
+            },
+            "preview": processed_metadata.get("preview_data", [])
+        }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+@api_gateway.get("/files")
+async def list_files():
+    """List all uploaded files"""
+    if file_service is None:
+        return {"status": "error", "error": "File service not available"}
+    
+    try:
+        files = file_service.list_files()
+        return {"status": "success", "files": files}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@api_gateway.get("/files/{file_id}")
+async def get_file_info(file_id: str):
+    """Get information about a specific file"""
+    if file_service is None:
+        return {"status": "error", "error": "File service not available"}
+    
+    try:
+        file_info = file_service.get_file_info(file_id)
+        if file_info:
+            return {"status": "success", "file_info": file_info}
+        else:
+            raise HTTPException(status_code=404, detail="File not found")
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@api_gateway.delete("/files/{file_id}")
+async def delete_file(file_id: str):
+    """Delete a file and its processed data"""
+    if file_service is None:
+        return {"status": "error", "error": "File service not available"}
+    
+    try:
+        success = file_service.delete_file(file_id)
+        if success:
+            return {"status": "success", "message": "File deleted successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="File not found or deletion failed")
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

@@ -78,6 +78,27 @@ class SchemaResponse(BaseModel):
     procedures: List[Dict[str, Any]]
     last_updated: datetime
 
+# File metadata models
+class FileMetadata(BaseModel):
+    file_id: str = Field(..., description="Unique file identifier")
+    original_filename: str = Field(..., description="Original filename")
+    stored_filename: str = Field(..., description="Filename in storage")
+    content_type: str = Field(..., description="MIME type")
+    file_extension: str = Field(..., description="File extension")
+    file_size: int = Field(..., description="File size in bytes")
+    file_hash: str = Field(..., description="SHA256 hash")
+    upload_time: datetime = Field(..., description="Upload timestamp")
+    status: str = Field(..., description="Processing status")
+    rows_count: Optional[int] = Field(None, description="Number of data rows")
+    columns_count: Optional[int] = Field(None, description="Number of columns")
+    processed_time: Optional[datetime] = Field(None, description="Processing timestamp")
+    error_message: Optional[str] = Field(None, description="Error if processing failed")
+
+class FileUploadResponse(BaseModel):
+    file_id: str
+    message: str
+    status: str
+
 # API Endpoints
 
 @app.get("/health")

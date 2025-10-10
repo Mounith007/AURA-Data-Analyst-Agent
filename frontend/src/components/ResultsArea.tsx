@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 import SqlDisplay from './SqlDisplay';
 import DataDisplay from './DataDisplay';
 import type { DataResult } from '../types';
@@ -18,8 +19,10 @@ const ResultsArea: React.FC<ResultsAreaProps> = ({
   onApproval,
   isLoading = false
 }) => {
+  const { theme } = useTheme();
+  
   return (
-    <div className="results-area">
+    <div className="results-area" data-theme={theme}>
       <SqlDisplay 
         sqlQuery={sqlQuery} 
         pendingApproval={pendingApproval}

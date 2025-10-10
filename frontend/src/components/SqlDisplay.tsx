@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface SqlDisplayProps {
   sqlQuery: string;
@@ -23,6 +24,7 @@ const SqlDisplay: React.FC<SqlDisplayProps> = ({
   isEditable = true,
   showVersionHistory = false
 }) => {
+  const { theme } = useTheme();
   const [editedQuery, setEditedQuery] = useState(sqlQuery);
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -92,7 +94,7 @@ const SqlDisplay: React.FC<SqlDisplayProps> = ({
   };
 
   return (
-    <div className="sql-display glass-box-ide">
+    <div className="sql-display glass-box-ide" data-theme={theme}>
       <div className="sql-header">
         <div className="header-left">
           <h3>🔍 Glass Box - SQL Code Review</h3>

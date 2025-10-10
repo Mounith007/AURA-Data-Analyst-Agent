@@ -4,6 +4,11 @@ pydantic
 google-generativeai
 python-dotenv
 httpx
+pandas
+openpyxl
+aiofiles
+python-multipart
+pyarrow
 
 # Database drivers
 psycopg2-binary
