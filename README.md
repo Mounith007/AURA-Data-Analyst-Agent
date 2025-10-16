@@ -56,6 +56,7 @@ docker ps
 | **Frontend** | http://localhost:5173 | http://localhost:5173 | React UI Interface |
 | **API Gateway** | http://localhost:8000 | http://localhost:8000 | Backend coordination |
 | **Database API** | http://localhost:8002 | http://localhost:8002 | Universal DB connectivity |
+| **MCP Server** | http://localhost:8007 | http://localhost:8007 | AI Agent operations |
 | **Health Checks** | `/health` endpoints | Container health monitoring | Service status |
 
 ### 🔄 Deployment Status: **✅ FULLY OPERATIONAL**
@@ -74,8 +75,11 @@ docker ps
 ## 📊 Features
 
 - **🤖 AI Chat** - Natural language data analysis with Google Gemini
+- **🤖 AI Agents** - Multi-agent system with database agent and MCP servers
 - **📊 Visualizations** - Interactive charts (Bar, Line, Pie, Radar) with Chart.js
 - **🔌 Universal Connectivity** - 12+ database types (SQL/NoSQL/Cloud)
+- **🛠️ Agent Tools** - Reusable tools for database operations and schema analysis
+- **🔄 Tiny Recursive Model** - Smart task decomposition for complex operations
 - **🐳 Docker Support** - Production-ready containerized deployment
 - **👥 Team Ready** - Automated setup scripts with health monitoring
 - **⚡ Microservices** - FastAPI backend with React TypeScript frontend
@@ -109,4 +113,5 @@ docker-compose down && docker-compose up -d
 
 - **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup
 - **[Team Setup Guide](README-TEAM.md)** - Detailed instructions  
+- **[AI Agent System](AGENT_SYSTEM_DOCS.md)** - AI agents and MCP servers documentation
 - **[API Documentation](http://localhost:8002/docs)** - Interactive API docs
