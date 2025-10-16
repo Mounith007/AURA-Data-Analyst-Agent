@@ -69,6 +69,27 @@ services:
       - ./aurabackend:/app
     restart: unless-stopped
 
+  # MCP Server - Model Context Protocol for AI Agents
+  mcp_server:
+    build: ./aurabackend
+    command: uvicorn mcp_server.main:app --host 0.0.0.0 --port 8007
+    ports:
+      - "8007:8007"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./aurabackend:/app
+    depends_on:
+      database_service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8007/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
   # Execution Sandbox
   execution_sandbox:
     build: ./aurabackend
