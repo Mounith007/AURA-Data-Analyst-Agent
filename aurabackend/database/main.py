@@ -9,8 +9,13 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 import uuid
+import sys
+import os
 
-from .connection_manager import (
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from connection_manager import (
     DatabaseConnection, 
     DatabaseType, 
     db_manager
