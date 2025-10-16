@@ -7,6 +7,11 @@ from typing import Dict, Any, List, Optional, Callable, Awaitable
 from dataclasses import dataclass, field
 from datetime import datetime
 import asyncio
+import os
+import sys
+
+# Add parent directory to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 @dataclass
 class Tool:
@@ -40,7 +45,18 @@ class ToolRegistry:
     
     def __init__(self):
         self.tools: Dict[str, Tool] = {}
+        self.db_tools = None
         self._initialize_default_tools()
+    
+    def _get_db_tools(self):
+        """Lazy load database tools to avoid circular imports"""
+        if self.db_tools is None:
+            try:
+                from mcp_server.database_tools import database_tools
+                self.db_tools = database_tools
+            except ImportError:
+                pass
+        return self.db_tools
     
     def _initialize_default_tools(self):
         """Initialize default tools"""
@@ -128,41 +144,45 @@ class ToolRegistry:
             )
         )
     
-    # Tool handlers (these would integrate with actual services)
+    # Tool handlers (these integrate with actual services)
     async def _connect_database_handler(self, parameters: Dict[str, Any]) -> Any:
         """Handler for database connection"""
-        # This would integrate with the database service
+        db_tools = self._get_db_tools()
+        if db_tools:
+            return await db_tools.connect_database_handler(parameters)
         return {
-            "status": "connected",
-            "connection_id": parameters["connection_id"],
-            "message": "Database connection established"
+            "status": "error",
+            "error": "Database tools not available"
         }
     
     async def _list_database_connections_handler(self, parameters: Dict[str, Any]) -> Any:
         """Handler for listing database connections"""
-        # This would integrate with the database service
+        db_tools = self._get_db_tools()
+        if db_tools:
+            return await db_tools.list_database_connections_handler(parameters)
         return {
-            "connections": [],
-            "count": 0
+            "status": "error",
+            "error": "Database tools not available"
         }
     
     async def _query_database_handler(self, parameters: Dict[str, Any]) -> Any:
         """Handler for database queries"""
-        # This would integrate with the database service
+        db_tools = self._get_db_tools()
+        if db_tools:
+            return await db_tools.query_database_handler(parameters)
         return {
-            "columns": [],
-            "rows": [],
-            "row_count": 0,
-            "execution_time_ms": 0
+            "status": "error",
+            "error": "Database tools not available"
         }
     
     async def _get_database_schema_handler(self, parameters: Dict[str, Any]) -> Any:
         """Handler for getting database schema"""
-        # This would integrate with the database service
+        db_tools = self._get_db_tools()
+        if db_tools:
+            return await db_tools.get_database_schema_handler(parameters)
         return {
-            "schemas": [],
-            "tables": [],
-            "views": []
+            "status": "error",
+            "error": "Database tools not available"
         }
     
     async def _analyze_data_handler(self, parameters: Dict[str, Any]) -> Any:

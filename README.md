@@ -56,6 +56,8 @@ docker ps
 | **Frontend** | http://localhost:5173 | http://localhost:5173 | React UI Interface |
 | **API Gateway** | http://localhost:8000 | http://localhost:8000 | Backend coordination |
 | **Database API** | http://localhost:8002 | http://localhost:8002 | Universal DB connectivity |
+| **MCP Server** | http://localhost:8003 | http://localhost:8003 | Multi-agent coordination |
+| **Database Agent** | http://localhost:8004 | http://localhost:8004 | AI-powered DB operations |
 | **Health Checks** | `/health` endpoints | Container health monitoring | Service status |
 
 ### 🔄 Deployment Status: **✅ FULLY OPERATIONAL**
@@ -74,12 +76,16 @@ docker ps
 ## 📊 Features
 
 - **🤖 AI Chat** - Natural language data analysis with Google Gemini
+- **🧠 AI Agents** - Multi-agent system with Database Agent (Gemini Flash) for intelligent DB operations
+- **🔧 MCP Server** - Model Context Protocol for agent communication and tool orchestration
 - **📊 Visualizations** - Interactive charts (Bar, Line, Pie, Radar) with Chart.js
 - **🔌 Universal Connectivity** - 12+ database types (SQL/NoSQL/Cloud)
+- **🛠️ Tool System** - Extensible tool registry for agent capabilities
 - **🐳 Docker Support** - Production-ready containerized deployment
 - **👥 Team Ready** - Automated setup scripts with health monitoring
 - **⚡ Microservices** - FastAPI backend with React TypeScript frontend
 - **🔒 Enterprise Ready** - Environment configuration and security features
+- **📈 Scalable** - Architecture designed for multiple AI agents and future expansion
 
 ## � Troubleshooting
 
@@ -100,10 +106,86 @@ docker ps
 # Test API endpoints
 Invoke-WebRequest http://localhost:8000/health
 Invoke-WebRequest http://localhost:8002/health
+Invoke-WebRequest http://localhost:8003/health  # MCP Server
+Invoke-WebRequest http://localhost:8004/health  # Database Agent
 
 # Restart Docker services
 docker-compose down && docker-compose up -d
 ```
+
+## 🤖 AI Agents & MCP Server
+
+AURA now includes a **Model Context Protocol (MCP) Server** and multiple AI agents for intelligent database operations and analysis.
+
+### Architecture
+
+- **MCP Server** (Port 8003) - Central coordination for multi-agent systems
+- **Database Connection Agent** (Port 8004) - AI-powered database management using Gemini 1.5 Flash
+
+### Database Connection Agent
+
+The Database Connection Agent uses **Google Gemini 1.5 Flash** (tiny recursive model) for:
+- 🔌 Intelligent database connection management
+- 📊 AI-powered schema analysis and insights
+- ⚡ Query optimization recommendations
+- 🛡️ Security and performance best practices
+- 🎯 Natural language database operations
+
+### Available Agents
+
+1. **Database Agent** - Database connectivity and management (Gemini Flash)
+2. **SQL Generator** - Natural language to SQL conversion (Gemini Pro)
+3. **SQL Critic** - Query validation and optimization (Gemini Pro)
+4. **Data Analyst** - Automated data insights (Gemini Flash)
+5. **Orchestrator** - Multi-agent task coordination (Gemini Pro)
+
+### Quick Start with Agents
+
+```bash
+# Start all services including MCP Server and agents
+cd aurabackend
+./start_all_services.sh
+
+# Test integration
+python3 test_integration.py
+
+# Access agent endpoints
+curl http://localhost:8004/agent/info
+curl http://localhost:8003/agents
+curl http://localhost:8003/tools
+```
+
+### Example: Using the Database Agent
+
+```bash
+# Get agent capabilities
+curl http://localhost:8004/agent/info
+
+# List database connections
+curl http://localhost:8004/connections
+
+# Get AI-powered schema insights
+curl http://localhost:8004/connections/{id}/schema
+
+# Get query optimization suggestions
+curl -X POST http://localhost:8004/query/optimize \
+  -H "Content-Type: application/json" \
+  -d '{"connection_id": "xxx", "query": "SELECT * FROM users"}'
+```
+
+For detailed documentation, see [MCP_DATABASE_AGENT.md](aurabackend/MCP_DATABASE_AGENT.md)
+
+## 🛠️ Tool System
+
+The MCP Server provides an extensible tool registry that agents can use:
+
+- **Database Tools**: connect_database, query_database, get_schema
+- **Analysis Tools**: analyze_data, generate_insights
+- **Code Generation Tools**: generate_sql, optimize_query
+
+New tools can be easily registered and made available to all agents.
+
+
 
 ## �📚 Documentation
 
