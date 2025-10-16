@@ -38,7 +38,7 @@ class ToolCallRequest(BaseModel):
     arguments: Dict[str, Any] = Field(default_factory=dict, description="Tool arguments")
 
 class AgentTaskRequest(BaseModel):
-    agent_id: str = Field(..., description="ID of the agent")
+    agent_id: Optional[str] = Field(None, description="ID of the agent (optional, can be provided in URL)")
     task_type: str = Field(..., description="Type of task to execute")
     parameters: Dict[str, Any] = Field(default_factory=dict, description="Task parameters")
 
@@ -135,6 +135,9 @@ async def get_agent_info(agent_id: str):
 @app.post("/agents/{agent_id}/tasks")
 async def execute_agent_task(agent_id: str, request: AgentTaskRequest):
     """Execute a task on a specific agent"""
+    # Override agent_id from path parameter
+    request.agent_id = agent_id
+    
     agent = global_agent_registry.get(agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
