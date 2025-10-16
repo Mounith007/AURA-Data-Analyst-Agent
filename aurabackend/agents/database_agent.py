@@ -1,6 +1,6 @@
 """
 Database Connection Agent
-Specialized AI agent for database connections and schema management using Gemini Flash (tiny recursive model)
+Specialized AI agent for database connections and schema management using Gemini Flash (fast, lightweight model)
 """
 
 import os
@@ -28,7 +28,7 @@ if api_key:
 class DatabaseConnectionAgent:
     """
     AI Agent specialized in database connections and management
-    Uses Gemini 1.5 Flash (tiny recursive model) for efficient processing
+    Uses Gemini 1.5 Flash (fast, lightweight model) for efficient processing
     """
     
     def __init__(self):

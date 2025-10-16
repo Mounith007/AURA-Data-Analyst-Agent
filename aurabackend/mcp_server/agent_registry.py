@@ -47,7 +47,7 @@ class AgentRegistry:
                 name="Database Connection Agent",
                 type=AgentType.DATABASE,
                 description="Specialized agent for database connections and schema management",
-                model="gemini-1.5-flash",  # Using tiny recursive model
+                model="gemini-1.5-flash",  # Fast, lightweight model for efficiency
                 capabilities=[
                     "connect_to_databases",
                     "manage_connections",
@@ -124,7 +124,7 @@ class AgentRegistry:
                 name="Data Analyst Agent",
                 type=AgentType.ANALYST,
                 description="Analyzes data and provides insights",
-                model="gemini-1.5-flash",  # Using tiny recursive model
+                model="gemini-1.5-flash",  # Fast, lightweight model for quick analysis
                 capabilities=[
                     "analyze_data",
                     "generate_insights",

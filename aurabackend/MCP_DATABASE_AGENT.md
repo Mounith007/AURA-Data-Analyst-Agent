@@ -22,7 +22,7 @@ The AURA MCP (Model Context Protocol) Server provides a centralized infrastructu
 
 ## Database Connection Agent
 
-The Database Connection Agent is an AI-powered agent specialized in database connectivity and management. It uses **Google Gemini 1.5 Flash** (tiny recursive model) for efficient AI-powered insights and recommendations.
+The Database Connection Agent is an AI-powered agent specialized in database connectivity and management. It uses **Google Gemini 1.5 Flash** (fast, lightweight model) for efficient AI-powered insights and recommendations.
 
 ### Features
 
@@ -315,7 +315,7 @@ The Agent Registry manages all AI agents in the system.
 ### Default Agents
 
 1. **Database Connection Agent** (`db-agent-001`)
-   - Model: gemini-1.5-flash (tiny recursive model)
+   - Model: gemini-1.5-flash (fast, lightweight model)
    - Specialization: Database connectivity
 
 2. **SQL Generator Agent** (`gen-agent-001`)
@@ -327,7 +327,7 @@ The Agent Registry manages all AI agents in the system.
    - Specialization: SQL validation
 
 4. **Data Analyst Agent** (`analyst-agent-001`)
-   - Model: gemini-1.5-flash (tiny recursive model)
+   - Model: gemini-1.5-flash (fast, lightweight model)
    - Specialization: Data analysis
 
 5. **Orchestrator Agent** (`orch-agent-001`)

@@ -17,7 +17,7 @@ A central coordination server implementing the Model Context Protocol for agent 
 - Extensible architecture for custom tools and agents
 
 ### 2. Database Connection Agent (Port 8004)
-An AI-powered agent specialized in database operations using **Google Gemini 1.5 Flash** (tiny recursive model).
+An AI-powered agent specialized in database operations using **Google Gemini 1.5 Flash** (fast, lightweight model).
 
 **Capabilities:**
 - Connect to 12+ database types (PostgreSQL, MySQL, MongoDB, Snowflake, BigQuery, etc.)
@@ -30,7 +30,7 @@ An AI-powered agent specialized in database operations using **Google Gemini 1.5
 **Why Gemini Flash?**
 - Fast response times (~1-2 seconds)
 - Efficient token usage
-- Perfect for recursive/iterative database tasks
+- Optimized for frequent, quick database queries
 - Cost-effective for production use
 
 ### 3. Complete Tool System
@@ -50,10 +50,10 @@ Five specialized agents working together:
 
 | Agent | Model | Role |
 |-------|-------|------|
-| Database Connection Agent | Gemini Flash | DB connectivity & management |
+| Database Connection Agent | Gemini 1.5 Flash | DB connectivity & management |
 | SQL Generator Agent | Gemini Pro | Query generation from NL |
 | SQL Critic Agent | Gemini Pro | Query validation & optimization |
-| Data Analyst Agent | Gemini Flash | Quick data insights |
+| Data Analyst Agent | Gemini 1.5 Flash | Quick data insights |
 | Orchestrator Agent | Gemini Pro | Multi-agent coordination |
 
 ## Architecture
