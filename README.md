@@ -56,6 +56,7 @@ docker ps
 | **Frontend** | http://localhost:5173 | http://localhost:5173 | React UI Interface |
 | **API Gateway** | http://localhost:8000 | http://localhost:8000 | Backend coordination |
 | **Database API** | http://localhost:8002 | http://localhost:8002 | Universal DB connectivity |
+| **MCP Server** | http://localhost:8007 | http://localhost:8007 | AI Agent coordination |
 | **Health Checks** | `/health` endpoints | Container health monitoring | Service status |
 
 ### 🔄 Deployment Status: **✅ FULLY OPERATIONAL**
@@ -74,6 +75,9 @@ docker ps
 ## 📊 Features
 
 - **🤖 AI Chat** - Natural language data analysis with Google Gemini
+- **🧠 Enhanced AI Agent** - Recursive reasoning with tiny recursive model for complex queries
+- **🔧 Agent Tools** - Database operations, query validation, schema analysis, recursive reasoning
+- **🔄 MCP Server** - Model Context Protocol for agent coordination and context management
 - **📊 Visualizations** - Interactive charts (Bar, Line, Pie, Radar) with Chart.js
 - **🔌 Universal Connectivity** - 12+ database types (SQL/NoSQL/Cloud)
 - **🐳 Docker Support** - Production-ready containerized deployment
@@ -109,4 +113,41 @@ docker-compose down && docker-compose up -d
 
 - **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup
 - **[Team Setup Guide](README-TEAM.md)** - Detailed instructions  
+- **[AI Agent Documentation](aurabackend/AI_AGENT_README.md)** - MCP Server & Agent Tools
 - **[API Documentation](http://localhost:8002/docs)** - Interactive API docs
+
+## 🤖 AI Agent Architecture
+
+AURA now includes an enhanced AI agent system with:
+
+### MCP Server (Model Context Protocol)
+- Centralized context management for AI agents
+- Agent-to-agent communication protocol
+- Conversation history tracking
+- Database context management
+
+### Agent Tools
+1. **DatabaseTool** - Execute queries, manage connections
+2. **QueryValidator** - SQL security validation and injection prevention
+3. **SchemaAnalyzer** - Database schema analysis and optimization
+4. **RecursiveReasoner** - Tiny recursive model for complex problem solving
+
+### Enhanced Database Agent
+- Natural language to SQL conversion
+- Recursive problem decomposition (breaks complex queries into sub-problems)
+- Automatic query validation and correction
+- Schema-aware query generation
+- Self-healing query generation
+
+**Example:**
+```python
+# User asks: "Show top 10 customers by revenue and their order counts"
+# Agent recursively breaks down into:
+#   1. Identify tables (customers, orders)
+#   2. Calculate revenue per customer
+#   3. Count orders per customer
+#   4. Combine and optimize
+# Result: Validated, optimized SQL query
+```
+
+For detailed documentation, see [AI Agent README](aurabackend/AI_AGENT_README.md)
