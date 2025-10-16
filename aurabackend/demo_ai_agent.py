@@ -14,6 +14,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from agent_tools import DatabaseTool, QueryValidator, SchemaAnalyzer, RecursiveReasoner
 from mcp_server.context_manager import context_manager
 
+# Display constants for consistent formatting
+MAX_QUESTION_LENGTH = 60
+MAX_ANSWER_LENGTH = 80
+MAX_QUERY_LENGTH = 60
+
 
 def print_section(title):
     """Print a section header"""
@@ -56,9 +61,13 @@ async def demo_recursive_reasoning():
 def print_tree(node, indent=0):
     """Print reasoning tree recursively"""
     prefix = "  " * indent
-    print(f"{prefix}├─ {node['step_type'].upper()}: {node['question'][:60]}...")
+    question = node['question'][:MAX_QUESTION_LENGTH]
+    print(f"{prefix}├─ {node['step_type'].upper()}: {question}...")
+    
     if node.get('answer'):
-        print(f"{prefix}│  ✓ {node['answer'][:80]}...")
+        answer = node['answer'][:MAX_ANSWER_LENGTH]
+        print(f"{prefix}│  ✓ {answer}...")
+    
     for sub in node.get('sub_questions', []):
         print_tree(sub, indent + 1)
 
@@ -77,7 +86,8 @@ async def demo_query_validation():
     
     for label, query in queries:
         print(f"\n📝 {label}:")
-        print(f"   Query: {query[:60]}...")
+        query_display = query[:MAX_QUERY_LENGTH]
+        print(f"   Query: {query_display}...")
         
         result = validator.validate_query(query, allow_modifications=False)
         
@@ -303,8 +313,15 @@ async def main():
         print("   4. Explore API at http://localhost:8007/docs")
         print("\n")
         
-    except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"\n❌ Error during demo: {e}")
+        import traceback
+        traceback.print_exc()
+    except ImportError as e:
+        print(f"\n❌ Import error: {e}")
+        print("Ensure all dependencies are installed: pip install -r requirements.txt")
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
         import traceback
         traceback.print_exc()
 
